@@ -74,6 +74,21 @@ export const constantRoutes = [
       }
     ]
   },
+  // {
+  //   path: '',
+  //   component: Layout,
+  //   redirect: 'index',
+  //   children: [
+  //     {
+  //       path: 'itemIndex',
+  //       component: () => import('@/views/item'),
+  //       name: 'itemIndex',
+  //       meta: { title: 'item', icon: 'edit', affix: true }
+  //     }
+  //   ]
+  //
+  // }
+  // ,
   {
     path: '/user',
     component: Layout,

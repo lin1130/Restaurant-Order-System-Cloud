@@ -13,6 +13,9 @@
         <module>ruoyi-gen</module>
         <module>ruoyi-job</module>
         <module>ruoyi-file</module>
+        <module>item</module>
+        <module>order</module>
+        <module>details</module>
     </modules>
 
     <artifactId>ruoyi-modules</artifactId>
