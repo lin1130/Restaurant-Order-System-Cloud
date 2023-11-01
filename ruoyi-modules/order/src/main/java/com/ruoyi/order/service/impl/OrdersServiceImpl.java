@@ -1,27 +1,28 @@
 package com.ruoyi.order.service.impl;
 
-import java.util.List;
+import com.ruoyi.order.domain.Orders;
+import com.ruoyi.order.mapper.OrdersMapper;
+import com.ruoyi.order.service.IOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.order.mapper.OrdersMapper;
-import com.ruoyi.order.domain.Orders;
-import com.ruoyi.order.service.IOrdersService;
+
+import java.util.List;
 
 /**
  * orderService业务层处理
- * 
+ *
  * @author group14
  * @date 2023-10-31
  */
 @Service
-public class OrdersServiceImpl implements IOrdersService 
+public class OrdersServiceImpl implements IOrdersService
 {
     @Autowired
     private OrdersMapper ordersMapper;
 
     /**
      * 查询order
-     * 
+     *
      * @param orderId order主键
      * @return order
      */
@@ -33,7 +34,7 @@ public class OrdersServiceImpl implements IOrdersService
 
     /**
      * 查询order列表
-     * 
+     *
      * @param orders order
      * @return order
      */
@@ -45,19 +46,29 @@ public class OrdersServiceImpl implements IOrdersService
 
     /**
      * 新增order
-     * 
+     *
      * @param orders order
      * @return 结果
      */
     @Override
-    public int insertOrders(Orders orders)
-    {
-        return ordersMapper.insertOrders(orders);
+//    public int insertOrders(Orders orders)
+//    {
+//        return ordersMapper.insertOrders(orders);
+//    }
+    public Orders insertOrders(Orders orders) {
+        int result = ordersMapper.insertOrders(orders);
+        if (result > 0) {
+            // Insertion successful, return the inserted order data
+            return orders;
+        } else {
+            // Insertion failed, return null or throw an exception
+            return null;
+        }
     }
 
     /**
      * 修改order
-     * 
+     *
      * @param orders order
      * @return 结果
      */
@@ -69,7 +80,7 @@ public class OrdersServiceImpl implements IOrdersService
 
     /**
      * 批量删除order
-     * 
+     *
      * @param orderIds 需要删除的order主键
      * @return 结果
      */
@@ -81,7 +92,7 @@ public class OrdersServiceImpl implements IOrdersService
 
     /**
      * 删除order信息
-     * 
+     *
      * @param orderId order主键
      * @return 结果
      */
