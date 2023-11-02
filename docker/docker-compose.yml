@@ -139,12 +139,38 @@ services:
     ports:
       - "9100:9100"
   ruoyi-modules-details:
-    container_name: ruoyi-modules-details
+    container_name: details
     build:
       context: ./ruoyi/modules/details
       dockerfile: dockerfile
     ports:
       - "8102:8102"
+    depends_on:
+      - ruoyi-redis
+      - ruoyi-mysql
+    links:
+      - ruoyi-redis
+      - ruoyi-mysql
+  ruoyi-modules-order:
+    container_name: order
+    build:
+      context: ./ruoyi/modules/order
+      dockerfile: dockerfile
+    ports:
+      - "8101:8101"
+    depends_on:
+      - ruoyi-redis
+      - ruoyi-mysql
+    links:
+      - ruoyi-redis
+      - ruoyi-mysql
+  ruoyi-modules-item:
+    container_name: item
+    build:
+      context: ./ruoyi/modules/item
+      dockerfile: dockerfile
+    ports:
+      - "8100:8100"
     depends_on:
       - ruoyi-redis
       - ruoyi-mysql
