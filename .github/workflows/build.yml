@@ -72,24 +72,24 @@ jobs:
 
       - name: Build with Maven
         run: |
-          mvn clean package
-          cd docker
-          chmod +x ./copy.sh
-          ./copy.sh
+          mvn clean package
+          cd docker
+          chmod +x ./copy.sh
+          ./copy.sh
 
-      - name: Setup SSH and SCP
-        run: |
-          mkdir -p ~/.ssh/
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          EC2_HOST: ${{ secrets.EC2_HOST }}
-    
-      - name: Copy Docker folder to EC2
-        run:
-          scp -r ./docker ubuntu@$EC2_HOST:/home/ubuntu/
-        env:
-          EC2_HOST: ${{ secrets.EC2_HOST }}
+      - name: Setup SSH and SCP
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+
+      - name: Copy Docker folder to EC2
+        run:
+          scp -r ./docker ubuntu@$EC2_HOST:/home/ubuntu/
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
     
