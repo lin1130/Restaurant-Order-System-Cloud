@@ -91,7 +91,6 @@ jobs:
         working-directory: ruoyi-ui
         run: |
           ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST <<EOF
-          sudo usermod -aG docker $USER
           docker pull $USERNAME/nginx:ui
           docker run nginx
           EOF
