@@ -43,10 +43,14 @@ jobs:
           mkdir -p ~/.ssh/
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
+          ssh-keyscan -H "$EC2_MYSQL" >> ~/.ssh/known_hosts
+          ssh-keyscan -H "$EC2_NACOS" >> ~/.ssh/known_hosts
+          ssh-keyscan -H "$EC2_REDIS" >> ~/.ssh/known_hosts
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          EC2_HOST: ${{ secrets.EC2_MYSQL }}
+          EC2_MYSQL: ${{ secrets.EC2_MYSQL }}
+          EC2_NACOS: ${{ secrets.EC2_NACOS }}
+          EC2_REDIS: ${{ secrets.EC2_REDIS }}
 
       # docker run --name mysql -e MYSQL_ROOT_PASSWORD=password -p 3306:3306 -d $USERNAME/mysql:v1
       - name: Deploy MySQL to Cloud
