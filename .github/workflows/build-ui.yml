@@ -74,7 +74,7 @@ jobs:
         with:
           context: ./ruoyi-ui/nginx
           push: true
-          tags: user/nginx:ui
+          tags: ${{ secrets.USERNAME }}/nginx:ui
       
       # - name: Build image
       #   working-directory: ruoyi-ui/nginx
