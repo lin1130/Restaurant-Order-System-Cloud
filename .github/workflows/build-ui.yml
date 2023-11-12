@@ -67,7 +67,7 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
           branch: gh-pages
-          folder: nginx/html/dist
+          folder: ruoyi-ui/nginx/html/dist
           github-token: ${{ secrets.DEVOPS }}
 
       - name: DockerHub Login
