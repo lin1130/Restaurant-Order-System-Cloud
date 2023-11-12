@@ -76,7 +76,7 @@ jobs:
       #     push: true
       #     tags: ${{ secrets.USERNAME }}/nginx:ui
 
-# 先打包到nginx 在nginx创建镜像 push到dockerHub 连接EC2 在EC2中从dockerHub pull镜像
+# 先打包到nginx 在nginx创建镜像 push到dockerHub 连接EC2 在EC2中从dockerHub pull镜像 docker pull $USERNAME/nginx:ui
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh/
@@ -91,8 +91,7 @@ jobs:
         working-directory: ruoyi-ui
         run: |
           ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST <<EOF
-          docker pull $USERNAME/nginx:ui
-          docker run --name nginx-ui -p 80:80 $USERNAME/nginx
+          docker run --name nginx-ui -p 80:80 $USERNAME/nginx:ui
           EOF
         env:
           EC2_HOST: ${{ secrets.EC2_UI }}
