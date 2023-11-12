@@ -18,21 +18,21 @@ jobs:
           password: ${{ secrets.PASSWORD }}
 
       - name: Build MySQL and Push
-        uses: docker/login-action@v1
+        uses: docker/build-push-action@v2
         with:
           context: ./docker/mysql
           push: true
           tags: ${{ secrets.USERNAME }}/mysql:v1
 
       - name: Build Nacos and Push
-        uses: docker/login-action@v1
+        uses: docker/build-push-action@v2
         with:
           context: ./docker/nacos
           push: true
           tags: ${{ secrets.USERNAME }}/nacos:v1
 
       - name: Build Redis and Push
-        uses: docker/login-action@v1
+        uses: docker/build-push-action@v2
         with:
           context: ./docker/redis
           push: true
