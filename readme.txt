@@ -1,0 +1,2 @@
+存放前端ruoyi-ui构建好的静态文件，用于nginx请求访问。
+先打包到nginx 在nginx创建镜像 push到dockerHub 连接EC2 在EC2中从dockerHub pull镜像
