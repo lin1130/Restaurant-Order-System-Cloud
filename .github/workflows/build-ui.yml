@@ -66,7 +66,7 @@ jobs:
       - name: Build image
         working-directory: ruoyi-ui/nginx
         run: |
-          docker build -t nginx:rosc:ui
+          docker buildx build -t nginx
           docker login -u $USERNAME -p $PASSWORD
           docker tag nginx $USERNAME/rosc:ui
           docker push $USERNAME/rosc:ui
@@ -89,8 +89,8 @@ jobs:
         working-directory: ruoyi-ui
         run: |
           ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST <<EOF
-          docker pull nginx:rosc-ui
-          docker run nginx:rosc-ui
+          docker pull nginx/rosc:ui
+          docker run nginx/rosc:ui
           EOF
         env:
           EC2_HOST: ${{ secrets.EC2_UI }}
