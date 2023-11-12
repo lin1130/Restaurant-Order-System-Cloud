@@ -72,7 +72,7 @@ jobs:
       - name: Build and Push
         uses: docker/build-push-action@v2
         with:
-          context: ../ruoyi-ui/nginx
+          context: ./ruoyi-ui/nginx
           push: true
           tags: user/nginx:ui
       
