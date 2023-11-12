@@ -1,0 +1,103 @@
+name: Front-end build and deployment
+
+on:
+  push:
+    branches: [cicd-test]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: browser-actions/setup-chrome@latest
+
+      - name: Set up Nodejs
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Cache node modules
+        id: cache-nodemodules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Install Dependencies
+        working-directory: ruoyi-ui
+        run: |
+          npm install
+
+      # - name: Conventional Changelog Action
+      #   id: changelog
+      #   uses: TriPSs/conventional-changelog-action@v3
+      #   with:
+      #     github-token: ${{ secrets.DEVOPS }} # 这里更换GitHub仓库的secret
+      #     output-file: "false"
+
+      # - name: Create Release
+      #   uses: actions/create-release@v1
+      #   if: ${{ steps.changelog.outputs.skipped == 'false' }}
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.DEVOPS }} # 这里更换GitHub仓库的secret
+      #   with:
+      #     tag_name: ${{ steps.changelog.outputs.tag }}
+      #     release_name: ${{ steps.changelog.outputs.tag }}
+      #     body: ${{ steps.changelog.outputs.clean_changelog }}
+
+      - name: Build with Vuejs
+        working-directory: ruoyi-ui
+        run: |
+          npm run build:prod
+          echo "begin copy html "
+          cp -r ../ruoyi-ui/dist/** ../ruoyi-ui/nginx/html/dist
+
+      - name: Build image
+        working-directory: ruoyi-ui/nginx
+        run: |
+          docker build -t nginx
+          docker login -u $USERNAME -p $PASSWORD
+          docker tag nginx $USERNAME/rosc:ui
+          docker push $USERNAME/rosc:ui
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+
+# 先打包到nginx 在nginx创建镜像 push到dockerHub 连接EC2 在EC2中从dockerHub pull镜像
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          EC2_HOST: ${{ secrets.EC2_UI }}
+
+      - name: Deploy to Cloud
+        working-directory: ruoyi-ui
+        run: |
+          ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST <<EOF
+          docker pull nginx:rosc-ui
+          docker run nginx:rosc-ui
+          EOF
+        env:
+          EC2_HOST: ${{ secrets.EC2_UI }}
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: gh-pages
+          folder: nginx/html/dist
+          github-token: ${{ secrets.DEVOPS }}
