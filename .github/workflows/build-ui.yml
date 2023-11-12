@@ -92,12 +92,11 @@ jobs:
         run: |
           ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST <<EOF
           docker pull $USERNAME/nginx:ui
-          docker run --name nginx-ui -p 80:80 nginx
+          docker run --name nginx-ui -p 80:80 $USERNAME/nginx
           EOF
         env:
           EC2_HOST: ${{ secrets.EC2_UI }}
           USERNAME: ${{ secrets.USERNAME }}
-          # PASSWORD: ${{ secrets.PASSWORD }}
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@4.1.4
