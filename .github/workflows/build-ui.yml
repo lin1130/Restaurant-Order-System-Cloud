@@ -34,10 +34,10 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
 
-      # - name: Install Dependencies
-      #   working-directory: ruoyi-ui
-      #   run: |
-      #     npm install
+      - name: Install Dependencies
+        working-directory: ruoyi-ui
+        run: |
+          npm install
 
       # - name: Conventional Changelog Action
       #   id: changelog
@@ -56,27 +56,27 @@ jobs:
       #     release_name: ${{ steps.changelog.outputs.tag }}
       #     body: ${{ steps.changelog.outputs.clean_changelog }}
 
-      # - name: Build with Vuejs
-      #   working-directory: ruoyi-ui
-      #   run: |
-      #     npm run build:prod
-      #     echo "begin copy html "
-      #     cp -r ../ruoyi-ui/dist/** ../ruoyi-ui/nginx/html/dist
+      - name: Build with Vuejs
+        working-directory: ruoyi-ui
+        run: |
+          npm run build:prod
+          echo "begin copy html "
+          cp -r ../ruoyi-ui/dist/** ../ruoyi-ui/nginx/html/dist
 
-      # - name: DockerHub Login
-      #   uses: docker/login-action@v1
-      #   with:
-      #     username: ${{ secrets.USERNAME }}
-      #     password: ${{ secrets.PASSWORD }}
+      - name: DockerHub Login
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
 
-      # - name: Build and Push
-      #   uses: docker/build-push-action@v2
-      #   with:
-      #     context: ./ruoyi-ui/nginx
-      #     push: true
-      #     tags: ${{ secrets.USERNAME }}/nginx:ui
+      - name: Build and Push
+        uses: docker/build-push-action@v2
+        with:
+          context: ./ruoyi-ui/nginx
+          push: true
+          tags: ${{ secrets.USERNAME }}/nginx:v1
 
-# 先打包到nginx 在nginx创建镜像 push到dockerHub 连接EC2 在EC2中从dockerHub pull镜像 docker pull $USERNAME/nginx:ui
+# 先打包到nginx 在nginx创建镜像 push到dockerHub 连接EC2 在EC2中从dockerHub pull镜像
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh/
@@ -91,7 +91,8 @@ jobs:
         working-directory: ruoyi-ui
         run: |
           ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST <<EOF
-          docker run --name nginx-ui -p 80:80 $USERNAME/nginx:ui
+          docker pull $USERNAME/nginx:v1
+          docker run --name nginx-ui -p 80:80 $USERNAME/nginx:v1
           EOF
         env:
           EC2_HOST: ${{ secrets.EC2_UI }}
