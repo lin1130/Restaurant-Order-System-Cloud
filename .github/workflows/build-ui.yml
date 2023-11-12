@@ -92,7 +92,7 @@ jobs:
         run: |
           ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST <<EOF
           docker pull $USERNAME/nginx:ui
-          docker run nginx
+          docker run --name nginx-ui -p 80:80 nginx
           EOF
         env:
           EC2_HOST: ${{ secrets.EC2_UI }}
