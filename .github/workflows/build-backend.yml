@@ -62,7 +62,7 @@ jobs:
           EC2_AUTH: ${{ secrets.EC2_AUTH }}
           EC2_SYSTEM: ${{ secrets.EC2_SYSTEM }}
 
-      # docker run --name gateway -p 8080:8080 -d $USERNAME/gateway:v1
+      # docker run --name ruoyi-gateway -p 8080:8080 -d $USERNAME/gateway:v1
       - name: Deploy gateway to Cloud
         working-directory: docker/ruoyi/gateway
         run: |
@@ -71,7 +71,7 @@ jobs:
           EC2_HOST: ${{ secrets.EC2_GATEWAY }}
           USERNAME: ${{ secrets.USERNAME }}
 
-      # docker run --name auth -p 9200:9200 -d $USERNAME/auth:v1
+      # docker run --name ruoyi-auth -p 9200:9200 -d $USERNAME/auth:v1
       - name: Deploy auth to Cloud
         working-directory: docker/ruoyi/auth
         run: |
@@ -80,7 +80,7 @@ jobs:
           EC2_HOST: ${{ secrets.EC2_AUTH }}
           USERNAME: ${{ secrets.USERNAME }}
 
-      # docker run --name system -p 9201:9201 -d $USERNAME/system:v1
+      # docker run --name ruoyi-modules-system -p 9201:9201 -d $USERNAME/modules-system:v1
       - name: Deploy modules-system to Cloud
         working-directory: docker/ruoyi/modules/system
         run: |
