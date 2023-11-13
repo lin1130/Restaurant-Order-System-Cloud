@@ -61,7 +61,7 @@ jobs:
         run: |
           npm run build:prod
           echo "begin copy html "
-          cp -r ./ruoyi-ui/dist/** ./docker/nginx/html/dist
+          cp -r ../ruoyi-ui/dist/** ../docker/nginx/html/dist
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@4.1.4
