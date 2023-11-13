@@ -84,7 +84,7 @@ jobs:
       - name: Deploy modules-system to Cloud
         working-directory: docker/ruoyi/modules/system
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST "docker pull $USERNAME/system:v1"
+          ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST "docker pull $USERNAME/modules-system:v1"
         env:
           EC2_HOST: ${{ secrets.EC2_SYSTEM }}
           USERNAME: ${{ secrets.USERNAME }}
