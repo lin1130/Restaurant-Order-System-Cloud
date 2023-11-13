@@ -61,13 +61,13 @@ jobs:
         run: |
           npm run build:prod
           echo "begin copy html "
-          cp -r ../ruoyi-ui/dist/** ../ruoyi-ui/nginx/html/dist
+          cp -r ./ruoyi-ui/dist/** ./docker/nginx/html/dist
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
           branch: gh-pages
-          folder: ruoyi-ui/nginx/html/dist
+          folder: docker/nginx/html/dist
           github-token: ${{ secrets.DEVOPS }}
 
       - name: DockerHub Login
@@ -79,7 +79,7 @@ jobs:
       - name: Build and Push
         uses: docker/build-push-action@v2
         with:
-          context: ./ruoyi-ui/nginx
+          context: ./docker/nginx
           push: true
           tags: ${{ secrets.USERNAME }}/nginx:v1
 
@@ -93,7 +93,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           EC2_HOST: ${{ secrets.EC2_UI }}
 
-      # docker run --name ruoyi-nginx -p 80:80 -d $USERNAME/nginx:v1
+      # docker run --name ruoyi-nginx -p 80:80 -d linfan1130/nginx:v1
       - name: Deploy to Cloud
         working-directory: ruoyi-ui
         run: |
