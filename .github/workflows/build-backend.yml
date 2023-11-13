@@ -49,7 +49,6 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           EC2_NACOS: ${{ secrets.EC2_NACOS }}
           EC2_REDIS: ${{ secrets.EC2_REDIS }}
-
       # docker run --name mysql -e MYSQL_ROOT_PASSWORD=password -p 3306:3306 -d $USERNAME/mysql:v1
       # - name: Deploy MySQL to Cloud
       #   working-directory: docker/mysql
