@@ -93,7 +93,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           EC2_HOST: ${{ secrets.EC2_UI }}
 
-      # docker run --name nginx-ui -p 80:80 $USERNAME/nginx:v1
+      # docker run --name nginx-ui -p 80:80 -d $USERNAME/nginx:v1
       - name: Deploy to Cloud
         working-directory: ruoyi-ui
         run: |
