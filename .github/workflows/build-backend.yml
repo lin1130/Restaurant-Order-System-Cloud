@@ -1,90 +1,90 @@
-name: Back-end build and deployment
+# name: Back-end build and deployment
 
-on:
-  push:
-    branches: [master]
+# on:
+#   push:
+#     branches: [master]
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v2
+#     steps:
+#       - uses: actions/checkout@v2
 
-      - name: Build with Maven
-        run: |
-          mvn clean package
-          echo "begin copy ruoyi-gateway "
-          cp ./ruoyi-gateway/target/ruoyi-gateway.jar ./docker/ruoyi/gateway/jar
-          echo "begin copy ruoyi-auth "
-          cp ./ruoyi-auth/target/ruoyi-auth.jar ./docker/ruoyi/auth/jar
-          echo "begin copy ruoyi-modules-system "
-          cp ./ruoyi-modules/ruoyi-system/target/ruoyi-modules-system.jar ./docker/ruoyi/modules/system/jar
+#       - name: Build with Maven
+#         run: |
+#           mvn clean package
+#           echo "begin copy ruoyi-gateway "
+#           cp ./ruoyi-gateway/target/ruoyi-gateway.jar ./docker/ruoyi/gateway/jar
+#           echo "begin copy ruoyi-auth "
+#           cp ./ruoyi-auth/target/ruoyi-auth.jar ./docker/ruoyi/auth/jar
+#           echo "begin copy ruoyi-modules-system "
+#           cp ./ruoyi-modules/ruoyi-system/target/ruoyi-modules-system.jar ./docker/ruoyi/modules/system/jar
 
-      - name: DockerHub Login
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
+#       - name: DockerHub Login
+#         uses: docker/login-action@v1
+#         with:
+#           username: ${{ secrets.USERNAME }}
+#           password: ${{ secrets.PASSWORD }}
       
-      - name: Build gateway and Push
-        uses: docker/build-push-action@v2
-        with:
-          context: ./docker/ruoyi/gateway
-          push: true
-          tags: ${{ secrets.USERNAME }}/gateway:v1
+#       - name: Build gateway and Push
+#         uses: docker/build-push-action@v2
+#         with:
+#           context: ./docker/ruoyi/gateway
+#           push: true
+#           tags: ${{ secrets.USERNAME }}/gateway:v1
 
-      - name: Build auth and Push
-        uses: docker/build-push-action@v2
-        with:
-          context: ./docker/ruoyi/auth
-          push: true
-          tags: ${{ secrets.USERNAME }}/auth:v1
+#       - name: Build auth and Push
+#         uses: docker/build-push-action@v2
+#         with:
+#           context: ./docker/ruoyi/auth
+#           push: true
+#           tags: ${{ secrets.USERNAME }}/auth:v1
 
-      - name: Build modules-system and Push
-        uses: docker/build-push-action@v2
-        with:
-          context: ./docker/ruoyi/modules/system
-          push: true
-          tags: ${{ secrets.USERNAME }}/modules-system:v1
+#       - name: Build modules-system and Push
+#         uses: docker/build-push-action@v2
+#         with:
+#           context: ./docker/ruoyi/modules/system
+#           push: true
+#           tags: ${{ secrets.USERNAME }}/modules-system:v1
 
-      - name: Set up SSH
-        run: |
-          mkdir -p ~/.ssh/
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H "$EC2_GATEWAY" >> ~/.ssh/known_hosts
-          ssh-keyscan -H "$EC2_AUTH" >> ~/.ssh/known_hosts
-          ssh-keyscan -H "$EC2_SYSTEM" >> ~/.ssh/known_hosts
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          EC2_GATEWAY: ${{ secrets.EC2_GATEWAY }}
-          EC2_AUTH: ${{ secrets.EC2_AUTH }}
-          EC2_SYSTEM: ${{ secrets.EC2_SYSTEM }}
+#       - name: Set up SSH
+#         run: |
+#           mkdir -p ~/.ssh/
+#           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+#           chmod 600 ~/.ssh/id_rsa
+#           ssh-keyscan -H "$EC2_GATEWAY" >> ~/.ssh/known_hosts
+#           ssh-keyscan -H "$EC2_AUTH" >> ~/.ssh/known_hosts
+#           ssh-keyscan -H "$EC2_SYSTEM" >> ~/.ssh/known_hosts
+#         env:
+#           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+#           EC2_GATEWAY: ${{ secrets.EC2_GATEWAY }}
+#           EC2_AUTH: ${{ secrets.EC2_AUTH }}
+#           EC2_SYSTEM: ${{ secrets.EC2_SYSTEM }}
 
-      # docker run --name ruoyi-gateway -p 8080:8080 -d linfan1130/gateway:v1
-      - name: Deploy gateway to Cloud
-        working-directory: docker/ruoyi/gateway
-        run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST "docker pull $USERNAME/gateway:v1"
-        env:
-          EC2_HOST: ${{ secrets.EC2_GATEWAY }}
-          USERNAME: ${{ secrets.USERNAME }}
+#       # docker run --name ruoyi-gateway -p 8080:8080 -d linfan1130/gateway:v1
+#       - name: Deploy gateway to Cloud
+#         working-directory: docker/ruoyi/gateway
+#         run: |
+#           ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST "docker pull $USERNAME/gateway:v1"
+#         env:
+#           EC2_HOST: ${{ secrets.EC2_GATEWAY }}
+#           USERNAME: ${{ secrets.USERNAME }}
 
-      # docker run --name ruoyi-auth -p 9200:9200 -d linfan1130/auth:v1
-      - name: Deploy auth to Cloud
-        working-directory: docker/ruoyi/auth
-        run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST "docker pull $USERNAME/auth:v1"
-        env:
-          EC2_HOST: ${{ secrets.EC2_AUTH }}
-          USERNAME: ${{ secrets.USERNAME }}
+#       # docker run --name ruoyi-auth -p 9200:9200 -d linfan1130/auth:v1
+#       - name: Deploy auth to Cloud
+#         working-directory: docker/ruoyi/auth
+#         run: |
+#           ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST "docker pull $USERNAME/auth:v1"
+#         env:
+#           EC2_HOST: ${{ secrets.EC2_AUTH }}
+#           USERNAME: ${{ secrets.USERNAME }}
 
-      # docker run --name ruoyi-system -p 9201:9201 -d linfan1130/modules-system:v1
-      - name: Deploy modules-system to Cloud
-        working-directory: docker/ruoyi/modules/system
-        run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST "docker pull $USERNAME/modules-system:v1"
-        env:
-          EC2_HOST: ${{ secrets.EC2_SYSTEM }}
-          USERNAME: ${{ secrets.USERNAME }}
+#       # docker run --name ruoyi-system -p 9201:9201 -d linfan1130/modules-system:v1
+#       - name: Deploy modules-system to Cloud
+#         working-directory: docker/ruoyi/modules/system
+#         run: |
+#           ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST "docker pull $USERNAME/modules-system:v1"
+#         env:
+#           EC2_HOST: ${{ secrets.EC2_SYSTEM }}
+#           USERNAME: ${{ secrets.USERNAME }}
