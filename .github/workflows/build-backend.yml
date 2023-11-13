@@ -11,73 +11,80 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Build with Maven
+        run: |
+          mvn clean package
+          echo "begin copy ruoyi-gateway "
+          cp ../ruoyi-gateway/target/ruoyi-gateway.jar ./ruoyi/gateway/jar
+          echo "begin copy ruoyi-auth "
+          cp ../ruoyi-auth/target/ruoyi-auth.jar ./ruoyi/auth/jar
+          echo "begin copy ruoyi-modules-system "
+          cp ../ruoyi-modules/ruoyi-system/target/ruoyi-modules-system.jar ./ruoyi/modules/system/jar
+
       - name: DockerHub Login
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
-
-      # - name: Build MySQL and Push
-      #   uses: docker/build-push-action@v2
-      #   with:
-      #     context: ./docker/mysql
-      #     push: true
-      #     tags: ${{ secrets.USERNAME }}/mysql:v1
-
-      - name: Build Nacos and Push
+      
+      - name: Build gateway and Push
         uses: docker/build-push-action@v2
         with:
-          context: ./docker/nacos
+          context: ./docker/ruoyi/gateway
           push: true
-          tags: ${{ secrets.USERNAME }}/nacos:v1
+          tags: ${{ secrets.USERNAME }}/gateway:v1
 
-      - name: Build Redis and Push
+      - name: Build auth and Push
         uses: docker/build-push-action@v2
         with:
-          context: ./docker/redis
+          context: ./docker/ruoyi/auth
           push: true
-          tags: ${{ secrets.USERNAME }}/redis:v1
+          tags: ${{ secrets.USERNAME }}/auth:v1
+
+      - name: Build modules-system and Push
+        uses: docker/build-push-action@v2
+        with:
+          context: ./docker/ruoyi/modules/system
+          push: true
+          tags: ${{ secrets.USERNAME }}/modules-system:v1
 
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh/
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H "$EC2_NACOS" >> ~/.ssh/known_hosts
-          ssh-keyscan -H "$EC2_REDIS" >> ~/.ssh/known_hosts
+          ssh-keyscan -H "$EC2_GATEWAY" >> ~/.ssh/known_hosts
+          ssh-keyscan -H "$EC2_AUTH" >> ~/.ssh/known_hosts
+          ssh-keyscan -H "$EC2_SYSTEM" >> ~/.ssh/known_hosts
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          EC2_NACOS: ${{ secrets.EC2_NACOS }}
-          EC2_REDIS: ${{ secrets.EC2_REDIS }}
-      # docker run --name mysql -e MYSQL_ROOT_PASSWORD=password -p 3306:3306 -d $USERNAME/mysql:v1
-      # - name: Deploy MySQL to Cloud
-      #   working-directory: docker/mysql
-      #   run: |
-      #     ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST "docker pull $USERNAME/mysql:v1"
-      #   env:
-      #     EC2_HOST: ${{ secrets.EC2_MYSQL }}
-      #     USERNAME: ${{ secrets.USERNAME }}
+          EC2_GATEWAY: ${{ secrets.EC2_GATEWAY }}
+          EC2_AUTH: ${{ secrets.EC2_AUTH }}
+          EC2_SYSTEM: ${{ secrets.EC2_SYSTEM }}
 
       # docker run --name nacos-server -e MODE=standalone -p 8848:8848 -d $USERNAME/nacos:v1
-      - name: Deploy Nacos to Cloud
-        working-directory: docker/nacos
+      - name: Deploy gateway to Cloud
+        working-directory: docker/ruoyi/gateway
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST "docker pull $USERNAME/nacos:v1"
+          ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST "docker pull $USERNAME/gateway:v1"
         env:
-          EC2_HOST: ${{ secrets.EC2_NACOS }}
+          EC2_HOST: ${{ secrets.EC2_GATEWAY }}
           USERNAME: ${{ secrets.USERNAME }}
 
       # docker run --name redis -p 6379:6379 -d $USERNAME/redis:v1
-      - name: Deploy Redis to Cloud
-        working-directory: docker/redis
+      - name: Deploy auth to Cloud
+        working-directory: docker/ruoyi/auth
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST "docker pull $USERNAME/redis:v1"
+          ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST "docker pull $USERNAME/auth:v1"
         env:
-          EC2_HOST: ${{ secrets.EC2_REDIS }}
+          EC2_HOST: ${{ secrets.EC2_AUTH }}
           USERNAME: ${{ secrets.USERNAME }}
 
-      # - name: Build with Maven
-      #   working-directory: backend-module
-      #   run: |
-      #     mvn clean package
-      #     docker build -t image
+      # docker run
+      - name: Deploy modules-system to Cloud
+        working-directory: docker/ruoyi/modules/system
+        run: |
+          ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST "docker pull $USERNAME/system:v1"
+        env:
+          EC2_HOST: ${{ secrets.EC2_SYSTEM }}
+          USERNAME: ${{ secrets.USERNAME }}
