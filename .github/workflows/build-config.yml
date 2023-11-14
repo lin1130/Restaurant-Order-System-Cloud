@@ -1,63 +1,63 @@
-# name: DataSource and Management build and deployment
+name: DataSource and Management build and deployment
 
-# on:
-#   push:
-#     branches: [master]
+on:
+  push:
+    branches: [master]
 
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-#     steps:
-#       - uses: actions/checkout@v2
+    steps:
+      - uses: actions/checkout@v2
 
-#       - name: DockerHub Login
-#         uses: docker/login-action@v1
-#         with:
-#           username: ${{ secrets.USERNAME }}
-#           password: ${{ secrets.PASSWORD }}
+      - name: DockerHub Login
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
 
-#       - name: Build Nacos and Push
-#         uses: docker/build-push-action@v2
-#         with:
-#           context: ./docker/nacos
-#           push: true
-#           tags: ${{ secrets.USERNAME }}/nacos:v1
+      - name: Build Nacos and Push
+        uses: docker/build-push-action@v2
+        with:
+          context: ./docker/nacos
+          push: true
+          tags: ${{ secrets.USERNAME }}/nacos:v1
 
-#       - name: Build Redis and Push
-#         uses: docker/build-push-action@v2
-#         with:
-#           context: ./docker/redis
-#           push: true
-#           tags: ${{ secrets.USERNAME }}/redis:v1
+      - name: Build Redis and Push
+        uses: docker/build-push-action@v2
+        with:
+          context: ./docker/redis
+          push: true
+          tags: ${{ secrets.USERNAME }}/redis:v1
 
-#       - name: Set up SSH
-#         run: |
-#           mkdir -p ~/.ssh/
-#           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-#           chmod 600 ~/.ssh/id_rsa
-#           ssh-keyscan -H "$EC2_NACOS" >> ~/.ssh/known_hosts
-#           ssh-keyscan -H "$EC2_REDIS" >> ~/.ssh/known_hosts
-#         env:
-#           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-#           EC2_NACOS: ${{ secrets.EC2_NACOS }}
-#           EC2_REDIS: ${{ secrets.EC2_REDIS }}
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "$EC2_NACOS" >> ~/.ssh/known_hosts
+          ssh-keyscan -H "$EC2_REDIS" >> ~/.ssh/known_hosts
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          EC2_NACOS: ${{ secrets.EC2_NACOS }}
+          EC2_REDIS: ${{ secrets.EC2_REDIS }}
 
-#       # docker run --name ruoyi-nacos -p 8848:8848 -p 9848:9848 -p 9849:9849 --privileged=true --restart=always -e MODE=standalone -d linfan1130/nacos:v1
-#       - name: Deploy Nacos to Cloud
-#         working-directory: docker/nacos
-#         run: |
-#           ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST "docker pull $USERNAME/nacos:v1"
-#         env:
-#           EC2_HOST: ${{ secrets.EC2_NACOS }}
-#           USERNAME: ${{ secrets.USERNAME }}
+      # docker run --name ruoyi-nacos -p 8848:8848 -p 9848:9848 -p 9849:9849 --privileged=true --restart=always -e MODE=standalone -d linfan1130/nacos:v1
+      - name: Deploy Nacos to Cloud
+        working-directory: docker/nacos
+        run: |
+          ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST "docker pull $USERNAME/nacos:v1"
+        env:
+          EC2_HOST: ${{ secrets.EC2_NACOS }}
+          USERNAME: ${{ secrets.USERNAME }}
 
-#       # docker run --name ruoyi-redis -p 6379:6379 -d linfan1130/redis:v1
-#       - name: Deploy Redis to Cloud
-#         working-directory: docker/redis
-#         run: |
-#           ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST "docker pull $USERNAME/redis:v1"
-#         env:
-#           EC2_HOST: ${{ secrets.EC2_REDIS }}
-#           USERNAME: ${{ secrets.USERNAME }}
+      # docker run --name ruoyi-redis -p 6379:6379 -d linfan1130/redis:v1
+      - name: Deploy Redis to Cloud
+        working-directory: docker/redis
+        run: |
+          ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST "docker pull $USERNAME/redis:v1"
+        env:
+          EC2_HOST: ${{ secrets.EC2_REDIS }}
+          USERNAME: ${{ secrets.USERNAME }}
 
